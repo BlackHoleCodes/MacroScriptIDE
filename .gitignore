@@ -1,0 +1,10 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Build output of the example project, and per-user project state
+examples/out/
+examples/.macroscript/
