@@ -106,7 +106,8 @@ Errors print as `file:line:column: error: message`. The exit code is 1 when a fi
 ```
 src/main/antlr4/.../MacroScript.g4   The grammar. The only list of keywords.
 src/main/antlr-generated/            The lexer and parser that ANTLR generates from the grammar.
-                                      Committed so IDEs compile without Maven; do not edit by hand.
+                                      Committed so IDEs compile without Maven. Change the grammar,
+                                      not these files: every build rewrites them from it.
 src/main/resources/.../macroscript-mapping.json
                                       The command table: all 419 triggers, constraints and actions.
 
