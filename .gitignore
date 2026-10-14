@@ -8,3 +8,8 @@ target/
 # Build output of the example project, and per-user project state
 examples/out/
 examples/.macroscript/
+
+# ANTLR side files; only the generated .java files are needed
+src/main/antlr-generated/**/*.tokens
+src/main/antlr-generated/**/*.interp
+src/main/antlr-generated/*.tokens

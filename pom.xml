@@ -16,6 +16,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.class>com.blackholecodes.macroscript.Main</main.class>
+        <generated.parser.dir>${project.basedir}/src/main/antlr-generated</generated.parser.dir>
 
         <antlr.version>4.13.2</antlr.version>
         <flatlaf.version>3.5.4</flatlaf.version>
@@ -52,6 +53,13 @@
             <version>${autocomplete.version}</version>
         </dependency>
 
+        <!-- The ANTLR tool, used by GeneratedParserTest to check the committed parser against the grammar. -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>${antlr.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -62,13 +70,19 @@
 
     <build>
         <plugins>
-            <!-- Generates the lexer and parser from src/main/antlr4/**/MacroScript.g4 -->
+            <!--
+              Generates the lexer and parser from src/main/antlr4/**/MacroScript.g4 into
+              src/main/antlr-generated. That folder is committed, so the project also compiles
+              in an IDE that does not run this plugin. Every Maven build regenerates it, and
+              GeneratedParserTest fails if the committed files no longer match the grammar.
+            -->
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>${antlr.version}</version>
                 <configuration>
-                    <visitor>true</visitor>
+                    <outputDirectory>${generated.parser.dir}</outputDirectory>
+                    <visitor>false</visitor>
                     <listener>false</listener>
                 </configuration>
                 <executions>
@@ -76,6 +90,27 @@
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Marks the generated parser folder as a source folder, also for IDEs that import the pom. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-generated-parser</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${generated.parser.dir}</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
