@@ -48,6 +48,9 @@ mvnw.cmd package        # Windows
 This runs the tests and writes one runnable file: `target/macroscript-ide-1.0.0.jar`.
 Add `-DskipTests` to build faster.
 
+The project also builds in an IDE (IntelliJ IDEA, Eclipse, VS Code) without running Maven
+first: open `pom.xml` as a Maven project. Set the project JDK to 21 or newer.
+
 ## Run
 
 - Double-click `target/macroscript-ide-1.0.0.jar`, or
@@ -102,6 +105,9 @@ Errors print as `file:line:column: error: message`. The exit code is 1 when a fi
 
 ```
 src/main/antlr4/.../MacroScript.g4   The grammar. The only list of keywords.
+src/main/antlr-generated/            The lexer and parser that ANTLR generates from the grammar.
+                                      Committed so IDEs compile without Maven. Change the grammar,
+                                      not these files: every build rewrites them from it.
 src/main/resources/.../macroscript-mapping.json
                                       The command table: all 419 triggers, constraints and actions.
 
@@ -152,13 +158,18 @@ decompiling and compiling again gives the same macro.
   register it in `ParamKinds`. The program refuses to start if a kind has no handler.
 - **A new helper like `wait(...)`**: add a method to `HelperCalls` and a case to
   `ActionCompiler.compileCall`; add the reverse to `ActionDecompiler`.
-- **A new keyword**: add it to the grammar. The editor colours it automatically (it reads the
-  keywords from the generated lexer). Add it to `reservedWords` in the mapping too;
+- **A change to the grammar**: edit `MacroScript.g4`, then run `./mvnw generate-sources` (any
+  Maven build does it too) and commit the files it changes in `src/main/antlr-generated/`.
+  `GeneratedParserTest` fails if you forget.
+- **A new keyword**: add it to the grammar as above. The editor colours it automatically (it
+  reads the keywords from the generated lexer). Add it to `reservedWords` in the mapping too;
   `KeywordsTest` fails if the two lists differ.
 
 ### Tests
 
 `./mvnw test` runs about 480 tests:
+
+- `GeneratedParserTest` checks that the committed parser matches the grammar.
 
 - `AllCommandsTest` calls every command of the mapping with sample values, compiles it,
   decompiles it and compiles it again, and checks the JSON is the same.
